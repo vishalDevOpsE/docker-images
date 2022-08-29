@@ -1,4 +1,4 @@
-FROM 	ubuntu:16.04
+FROM 	ubuntu
 RUN     echo "Vishal" >/tmp/testfile
 ENV     myname Vishal
 COPY    testfile /tmp

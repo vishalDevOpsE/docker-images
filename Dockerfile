@@ -1,7 +1,2 @@
-FROM 	ubuntu
-RUN     echo "Vishal" >/tmp/testfile
-ENV     myname Vishal
-COPY    testfile /tmp
-ADD     test.tar.gz /tmp
-
-
+FROM nginx
+COPY nginx.conf /etc/nginx/nginx.conf

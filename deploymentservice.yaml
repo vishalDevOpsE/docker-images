@@ -1,36 +1,41 @@
-apiVersion: apps/v1
-kind: Deployment # Kubernetes resource kind we are creating
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
 metadata:
-  name: k8s-deployment
+  name: nginx
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
-      app: spring-boot-k8s
-  replicas: 2 # Number of replicas that will be created for this deployment
-  template:
+      app: nginx
+  replicas: 3 # tells deployment to run 1 pods matching the template
+  template: # create pods using pod definition in this template
     metadata:
       labels:
-        app: spring-boot-k8s
+        app: nginx
     spec:
       containers:
-        - name: spring-boot-k8s
-          image: vishalcloud/test3:latest # Image that will be used to containers in the cluster
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 8080 # The port that the container is running on in the cluster
-
-
+      - name: nginx
+        image: vishalcloud/test:latest
+        ports:
+        - containerPort: 80
 ---
-
-apiVersion: v1 # Kubernetes API version
-kind: Service # Kubernetes resource kind we are creating
-metadata: # Metadata of the resource kind we are creating
-  name: k8ssvc
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: default
+  labels:
+    app: nginx
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
 spec:
-  selector:
-    app: spring-boot-k8s
+  externalTrafficPolicy: Local
   ports:
-    - protocol: "TCP"
-      port: 8080 # The port that the service is running on in the cluster
-      targetPort: 8080 # The port exposed by the service
-  type: NodePort # type of the service.
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: nginx
+  type: LoadBalancer
